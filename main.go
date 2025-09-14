@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -77,6 +78,7 @@ func main() {
 
 	_ = godotenv.Load()
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	// Subscriptions enpoints
 	r.GET("/subscriptions/:userId", getSubscriptions)
