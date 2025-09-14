@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -161,23 +162,30 @@ func main() {
 
 	r.GET("/api/payments/callback", func(c *gin.Context) {
 		paymentID := c.Query("razorpay_payment_id")
-		orderID := c.Query("razorpay_order_id")
-		signature := c.Query("razorpay_signature")
-		status := "failed"
+		// orderID := c.Query("razorpay_order_id")
+		// signature := c.Query("razorpay_signature")
+		// status := "failed"
 
+		var heading, color string
 		if paymentID != "" {
-			status = "success"
+			heading = "Payment Successful! Redirecting to home page..."
+			color = "green"
+		} else {
+			heading = "Payment Failed. Redirecting to home page..."
+			color = "red"
 		}
 
-		result := gin.H{
-			"payment_id": paymentID,
-			"order_id":   orderID,
-			"signature":  signature,
-			"status":     status,
-			"message":    "Payment callback received",
-		}
+		htmlResponse := fmt.Sprintf(`
+        <h1 style="color: %s;">%s</h1>
+        <script>
+            setTimeout(function() {
+                window.location.href = 'https://osto-billing-frontend.vercel.app/'; 
+            }, 3000); // Redirect after 3 seconds
+        </script>
+    `, color, heading)
 
-		c.JSON(http.StatusOK, result)
+		c.Data(http.StatusOK, "text/html", []byte(htmlResponse))
+
 	})
 
 	port := os.Getenv("PORT")
